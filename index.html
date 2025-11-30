@@ -4,130 +4,33 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#7c3aed" />
-    <meta name="description" content="LinkinFit - Il tuo Personal Trainer AI" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="LinkinFit - Futuristic AI Personal Trainer" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
-    <!-- PWA Meta Tags -->
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     
-    <title>LinkinFit - AI Personal Trainer</title>
+    <title>LinkinFit</title>
     
     <style>
-      /* CSS Variables */
-      :root {
-        --bg-color: #1f2937;
-        --text-color: #ffffff;
-        --hint-color: #9ca3af;
-        --primary-color: #7c3aed;
-        --secondary-bg: #374151;
-      }
-      
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      
-      body {
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { 
+        background: #000; 
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(135deg, #1f2937 0%, #4c1d95 50%, #1f2937 100%);
-        color: var(--text-color);
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
         min-height: 100vh;
-        overflow-x: hidden;
       }
-      
-      /* Loading screen */
-      #loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #1f2937 0%, #4c1d95 50%, #1f2937 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-      }
-      
-      .loading-logo {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #7c3aed, #ec4899);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        margin-bottom: 1.5rem;
-        animation: pulse 2s infinite;
-      }
-      
-      .loading-text {
-        color: #ffffff;
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-      
-      .loading-subtitle {
-        color: #a78bfa;
-        font-size: 1rem;
-        margin-top: 0.5rem;
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-      }
-      
-      .loaded #loading-screen {
-        opacity: 0;
-        pointer-events: none;
-      }
+      #root { min-height: 100vh; }
     </style>
-    <script type="module" crossorigin src="/assets/index-OcDIkLQk.js"></script>
+    <script type="module" crossorigin src="/assets/index-7OQoTArz.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-QTd-ifGo.js">
     <link rel="modulepreload" crossorigin href="/assets/router-CZZb1SVm.js">
     <link rel="modulepreload" crossorigin href="/assets/supabase-DfFNVlHZ.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-XuC0Q2pG.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CRluu4b7.css">
   <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
   <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-      <div class="loading-logo">💪</div>
-      <div class="loading-text">LinkinFit</div>
-      <div class="loading-subtitle">AI Personal Trainer</div>
-    </div>
-    
-    <!-- React App Root -->
     <div id="root"></div>
-    
-    
-    <script>
-      // Hide loading screen when app is ready
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          document.body.classList.add('loaded');
-        }, 500);
-      });
-      
-      // Prevent zoom on iOS
-      document.addEventListener('gesturestart', (e) => e.preventDefault());
-      
-      // Prevent double-tap zoom
-      let lastTouchEnd = 0;
-      document.addEventListener('touchend', (e) => {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) e.preventDefault();
-        lastTouchEnd = now;
-      }, false);
-    </script>
   </body>
 </html>
