@@ -1,7 +1,7 @@
 // ExerciseDB API Service
 // API gratuita con 1300+ esercizi e GIF animate
 
-const RAPIDAPI_KEY = 'YOUR_RAPIDAPI_KEY'; // Da configurare
+const RAPIDAPI_KEY = 'e352a46286mshc593f35371136dcp179511jsnc493f6b084c6';
 const RAPIDAPI_HOST = 'exercisedb.p.rapidapi.com';
 const BASE_URL = 'https://exercisedb.p.rapidapi.com';
 
