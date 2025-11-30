@@ -1,0 +1,449 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Custom CSS Variables */
+:root {
+  /* Telegram theme colors - will be overridden by JS */
+  --tg-theme-bg-color: #ffffff;
+  --tg-theme-text-color: #000000;
+  --tg-theme-hint-color: #999999;
+  --tg-theme-link-color: #0088cc;
+  --tg-theme-button-color: #0088cc;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-secondary-bg-color: #f1f1f1;
+  
+  /* App specific colors */
+  --primary-color: #0088cc;
+  --success-color: #4CAF50;
+  --warning-color: #FF9800;
+  --error-color: #f44336;
+  --info-color: #2196F3;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tg-theme-hint-color);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tg-theme-text-color);
+}
+
+/* Utility classes */
+.tg-bg {
+  background-color: var(--tg-theme-bg-color);
+}
+
+.tg-text {
+  color: var(--tg-theme-text-color);
+}
+
+.tg-hint {
+  color: var(--tg-theme-hint-color);
+}
+
+.tg-link {
+  color: var(--tg-theme-link-color);
+}
+
+.tg-button {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.tg-secondary-bg {
+  background-color: var(--tg-theme-secondary-bg-color);
+}
+
+/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+}
+
+.btn-secondary {
+  background-color: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.btn-error {
+  background-color: var(--error-color);
+  color: white;
+}
+
+/* Card styles */
+.card {
+  background-color: var(--tg-theme-bg-color);
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.card-secondary {
+  background-color: var(--tg-theme-secondary-bg-color);
+}
+
+/* Input styles */
+.input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  border-radius: var(--radius-md);
+  background-color: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--tg-theme-button-color);
+  box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
+}
+
+.input::placeholder {
+  color: var(--tg-theme-hint-color);
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.bounce-in {
+  animation: bounceIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive utilities */
+
+/* Mobile small */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .btn {
+    padding: var(--spacing-sm) var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+}
+
+/* Desktop / Monitor Palestra - Layout ottimizzato per schermi grandi */
+@media (min-width: 1024px) {
+  html {
+    font-size: 20px; /* Font piu grande per leggibilita a distanza */
+  }
+  
+  body {
+    max-width: 100%;
+  }
+  
+  /* Layout a griglia per desktop */
+  .desktop-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  /* Card piu grandi per monitor */
+  .card {
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+  }
+  
+  /* Bottoni piu grandi e cliccabili */
+  .btn {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+  
+  /* Timer grande per visibilita */
+  .timer-display {
+    font-size: 8rem !important;
+    font-weight: bold;
+  }
+  
+  /* Esercizio corrente ben visibile */
+  .current-exercise {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  /* Serie e ripetizioni grandi */
+  .sets-display {
+    font-size: 3rem;
+  }
+  
+  /* Progress bar piu alta */
+  .progress-bar {
+    height: 1.5rem;
+    border-radius: 0.75rem;
+  }
+}
+
+/* Monitor molto grande (TV/Proiettore) */
+@media (min-width: 1920px) {
+  html {
+    font-size: 24px;
+  }
+  
+  .timer-display {
+    font-size: 12rem !important;
+  }
+  
+  .current-exercise {
+    font-size: 3.5rem;
+  }
+  
+  .sets-display {
+    font-size: 4rem;
+  }
+}
+
+/* Safe area for devices with notches */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent text selection on UI elements */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Force bottom navigation to stay at bottom and full width */
+nav[class*="fixed"][class*="bottom-0"] {
+  position: fixed !important;
+  bottom: 0 !important;
+  top: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 9999 !important;
+}
+
+/* Force navigation container to full width */
+nav[class*="fixed"] > div {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Force navigation buttons to fill space */
+nav[class*="fixed"] a {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Force dashboard margins */
+.dashboard-container {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  margin-left: 0.5rem !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Haptic feedback simulation */
+.haptic-light:active {
+  animation: hapticLight 0.1s ease-out;
+}
+
+.haptic-medium:active {
+  animation: hapticMedium 0.15s ease-out;
+}
+
+.haptic-heavy:active {
+  animation: hapticHeavy 0.2s ease-out;
+}
+
+@keyframes hapticLight {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+@keyframes hapticMedium {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+@keyframes hapticHeavy {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+/* Custom Animations for Dashboard */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

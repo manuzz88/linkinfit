@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/workout-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0088cc" />
+    <meta name="description" content="LinkinFit Train - Mini App per il tuo Personal Training" />
+    
+    <!-- Telegram Mini App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <title>LinkinFit Train</title>
+    
+    <style>
+      /* CSS Variables per temi Telegram */
+      :root {
+        --tg-theme-bg-color: #ffffff;
+        --tg-theme-text-color: #000000;
+        --tg-theme-hint-color: #999999;
+        --tg-theme-link-color: #0088cc;
+        --tg-theme-button-color: #0088cc;
+        --tg-theme-button-text-color: #ffffff;
+        --tg-theme-secondary-bg-color: #f1f1f1;
+      }
+      
+      /* Reset e base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--tg-theme-bg-color);
+        color: var(--tg-theme-text-color);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+      
+      /* Loading screen */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--tg-theme-bg-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      
+      .loading-logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+      }
+      
+      .loading-text {
+        color: var(--tg-theme-text-color);
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+      
+      .loading-subtitle {
+        color: var(--tg-theme-hint-color);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.1); opacity: 1; }
+      }
+      
+      /* Hide loading when loaded */
+      .loaded #loading-screen {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Telegram specific styles */
+      .tg-bg { background-color: var(--tg-theme-bg-color); }
+      .tg-text { color: var(--tg-theme-text-color); }
+      .tg-hint { color: var(--tg-theme-hint-color); }
+      .tg-link { color: var(--tg-theme-link-color); }
+      .tg-button { 
+        background-color: var(--tg-theme-button-color);
+        color: var(--tg-theme-button-text-color);
+      }
+      .tg-secondary-bg { background-color: var(--tg-theme-secondary-bg-color); }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="loading-logo">💪</div>
+      <div class="loading-text">LinkinFit Train</div>
+      <div class="loading-subtitle">Il tuo Personal Trainer</div>
+    </div>
+    
+    <!-- React App Root -->
+    <div id="root"></div>
+    
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Initialize Telegram WebApp
+      if (window.Telegram?.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        console.log('🚀 Telegram WebApp detected');
+        console.log('User:', tg.initDataUnsafe.user);
+        console.log('Theme:', tg.themeParams);
+        
+        // Configure WebApp
+        tg.ready();
+        tg.expand();
+        
+        // Apply theme
+        const theme = tg.themeParams;
+        const root = document.documentElement;
+        
+        if (theme.bg_color) root.style.setProperty('--tg-theme-bg-color', theme.bg_color);
+        if (theme.text_color) root.style.setProperty('--tg-theme-text-color', theme.text_color);
+        if (theme.hint_color) root.style.setProperty('--tg-theme-hint-color', theme.hint_color);
+        if (theme.link_color) root.style.setProperty('--tg-theme-link-color', theme.link_color);
+        if (theme.button_color) root.style.setProperty('--tg-theme-button-color', theme.button_color);
+        if (theme.button_text_color) root.style.setProperty('--tg-theme-button-text-color', theme.button_text_color);
+        if (theme.secondary_bg_color) root.style.setProperty('--tg-theme-secondary-bg-color', theme.secondary_bg_color);
+        
+        // Store user data globally
+        window.telegramUser = tg.initDataUnsafe.user;
+        window.telegramWebApp = tg;
+        
+        // Hide loading screen after initialization
+        setTimeout(() => {
+          document.body.classList.add('loaded');
+        }, 1500);
+        
+      } else {
+        console.log('⚠️ Development mode - Telegram WebApp not available');
+        
+        // Mock user data for development
+        window.telegramUser = {
+          id: 1019529575,
+          first_name: 'Manuel',
+          last_name: 'Dev',
+          username: 'manuel_dev',
+          language_code: 'it'
+        };
+        
+        // Apply light theme for development (to see colors properly)
+        const root = document.documentElement;
+        root.style.setProperty('--tg-theme-bg-color', '#f5f5f5');
+        root.style.setProperty('--tg-theme-text-color', '#000000');
+        root.style.setProperty('--tg-theme-hint-color', '#999999');
+        root.style.setProperty('--tg-theme-link-color', '#0088cc');
+        root.style.setProperty('--tg-theme-button-color', '#0088cc');
+        root.style.setProperty('--tg-theme-button-text-color', '#ffffff');
+        root.style.setProperty('--tg-theme-secondary-bg-color', '#ffffff');
+        
+        // Hide loading screen quickly in dev mode
+        setTimeout(() => {
+          document.body.classList.add('loaded');
+        }, 800);
+      }
+      
+      // Prevent zoom on iOS
+      document.addEventListener('gesturestart', function (e) {
+        e.preventDefault();
+      });
+      
+      // Prevent double-tap zoom
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+    </script>
+  </body>
+</html>
