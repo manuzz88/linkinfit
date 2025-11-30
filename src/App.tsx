@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Dashboard from './components/Dashboard'
 import WorkoutSession from './components/WorkoutSession'
+import GymMonitorWorkout from './components/GymMonitorWorkout'
 import Statistics from './components/Statistics'
 import AICoach from './components/AICoach'
 import Settings from './components/Settings'
@@ -94,7 +95,8 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
-              <Route path="workout" element={<WorkoutSession />} />
+              <Route path="workout" element={<GymMonitorWorkout />} />
+              <Route path="workout-mobile" element={<WorkoutSession />} />
               <Route path="statistics" element={<Statistics />} />
               <Route path="ai-coach" element={<AICoach />} />
               <Route path="supplements" element={<Supplements />} />
