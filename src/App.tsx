@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 // Components
 import Layout from './components/Layout'
 import Dashboard from './components/Dashboard'
+import SmartCoachHome from './components/SmartCoachHome'
 import WorkoutSession from './components/WorkoutSession'
 import GymMonitorWorkout from './components/GymMonitorWorkout'
 import Statistics from './components/Statistics'
@@ -93,9 +94,15 @@ function AppContent() {
       <Router>
         <div className="min-h-screen tg-bg">
           <Routes>
+            {/* Home principale - Coach AI guida tutto */}
+            <Route index element={<SmartCoachHome />} />
+            
+            {/* Workout - Layout monitor palestra */}
+            <Route path="workout" element={<GymMonitorWorkout />} />
+            
+            {/* Altre pagine con layout */}
             <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="workout" element={<GymMonitorWorkout />} />
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="workout-mobile" element={<WorkoutSession />} />
               <Route path="statistics" element={<Statistics />} />
               <Route path="ai-coach" element={<AICoach />} />
