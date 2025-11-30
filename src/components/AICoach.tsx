@@ -1,6 +1,6 @@
+import { hapticFeedback } from '../utils/haptics';
 import React, { useState } from 'react'
 import { Send, MessageCircle } from 'lucide-react'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 
 interface Message {
   id: string;
@@ -20,7 +20,6 @@ const AICoach: React.FC = () => {
   ])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { hapticFeedback } = useTelegramWebApp()
 
   const handleSendMessage = async () => {
     if (!inputText.trim() || isLoading) return

@@ -1,11 +1,10 @@
+import { hapticFeedback } from '../utils/haptics';
 import React from 'react'
 import { Outlet, useLocation, Link } from 'react-router-dom'
 import { Home, BarChart3, MessageCircle, Settings, Pill } from 'lucide-react'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 
 const Layout: React.FC = () => {
   const location = useLocation()
-  const { hapticFeedback } = useTelegramWebApp()
 
   const navigationItems = [
     { path: '/', icon: Home, label: 'Home' },

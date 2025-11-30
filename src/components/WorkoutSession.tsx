@@ -1,13 +1,12 @@
+import { hapticFeedback, showBackButton, hideBackButton, hideMainButton } from '../utils/haptics';
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Play, SkipForward, CheckCircle } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 
 const WorkoutSession: React.FC = () => {
   const navigate = useNavigate()
   const { state, actions } = useWorkout()
-  const { hapticFeedback, showBackButton, hideBackButton, hideMainButton } = useTelegramWebApp()
   
   const [timer, setTimer] = useState(0)
   const [isResting, setIsResting] = useState(false)

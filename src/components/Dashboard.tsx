@@ -1,14 +1,13 @@
+import { hapticFeedback } from '../utils/haptics';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Play, Calendar, Target, Flame, Award, Zap } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 import { getUserStats, WorkoutStats } from '../services/apiService'
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate()
   const { state } = useWorkout()
-  const { hapticFeedback } = useTelegramWebApp()
   const [stats, setStats] = useState<WorkoutStats | null>(null)
   const [loading, setLoading] = useState(true)
 

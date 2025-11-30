@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useTelegramWebApp } from './hooks/useTelegramWebApp'
 import { WorkoutProvider } from './contexts/WorkoutContext'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
@@ -29,14 +28,11 @@ interface User {
 function AppContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
-  const { webApp, isAvailable } = useTelegramWebApp()
   const { user: supabaseUser, loading: authLoading } = useAuth()
 
   useEffect(() => {
-    // Initialize app
     const initApp = async () => {
       try {
-        // Se abbiamo un utente Supabase, usalo
         if (supabaseUser) {
           setUser({
             id: 1019529575,
@@ -45,28 +41,9 @@ function AppContent() {
             username: supabaseUser.email?.split('@')[0] || 'manuel',
             language_code: 'it'
           })
-        } else {
-          // Get user data from Telegram or mock data
-          const userData = window.telegramUser || null
-          setUser(userData)
         }
         
-        // Configure Telegram WebApp if available
-        if (webApp && isAvailable) {
-          // Set main button
-          webApp.MainButton.setText('Inizia Workout')
-          webApp.MainButton.show()
-          
-          // Set back button handler
-          webApp.BackButton.onClick(() => {
-            window.history.back()
-          })
-          
-          console.log('Telegram WebApp configured')
-        }
-        
-        // Simulate loading time
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
       } catch (error) {
         console.error('Error initializing app:', error)
@@ -78,21 +55,20 @@ function AppContent() {
     if (!authLoading) {
       initApp()
     }
-  }, [webApp, isAvailable, supabaseUser, authLoading])
+  }, [supabaseUser, authLoading])
 
   if (isLoading || authLoading) {
     return <LoadingScreen />
   }
 
-  // Se non c'e utente Telegram e non c'e utente Supabase, mostra login
-  if (!user && !supabaseUser) {
+  if (!supabaseUser) {
     return <LoginPage />
   }
 
   return (
     <WorkoutProvider user={user || { id: 0, first_name: 'Guest' }}>
       <Router>
-        <div className="min-h-screen tg-bg">
+        <div className="min-h-screen bg-gray-900">
           <Routes>
             {/* Home principale - Coach AI guida tutto */}
             <Route index element={<SmartCoachHome />} />

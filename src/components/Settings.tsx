@@ -1,11 +1,10 @@
+import { hapticFeedback } from '../utils/haptics';
 import React from 'react'
 import { User, Bell, Dumbbell, Palette, Info, LogOut } from 'lucide-react'
 import { useWorkout } from '../contexts/WorkoutContext'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 
 const Settings: React.FC = () => {
   const { state } = useWorkout()
-  const { hapticFeedback, close } = useTelegramWebApp()
 
   const settingsGroups = [
     {

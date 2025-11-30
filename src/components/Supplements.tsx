@@ -1,6 +1,6 @@
+import { hapticFeedback } from '../utils/haptics';
 import React, { useState } from 'react'
 import { CheckCircle, AlertCircle } from 'lucide-react'
-import { useTelegramWebApp } from '../hooks/useTelegramWebApp'
 
 interface Supplement {
   name: string;
@@ -11,7 +11,6 @@ interface Supplement {
 }
 
 const Supplements: React.FC = () => {
-  const { hapticFeedback } = useTelegramWebApp()
   
   const [workoutDay] = useState(true) // Mock: today is workout day
   
