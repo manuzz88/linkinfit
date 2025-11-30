@@ -20,10 +20,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Timeout per evitare blocchi
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
     // Controlla sessione esistente
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeout);
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
+    }).catch(() => {
+      clearTimeout(timeout);
       setLoading(false);
     });
 
