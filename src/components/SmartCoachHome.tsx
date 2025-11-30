@@ -4,11 +4,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Mic, MicOff, Send, Dumbbell, Play, 
+  Mic, Send, Dumbbell, Play, 
   Clock, TrendingUp, Flame,
-  Volume2, VolumeX
+  Volume2, VolumeX, Loader2
 } from 'lucide-react';
 import { coachAI } from '../services/coachAIService';
+import { voiceService } from '../services/voiceService';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -40,6 +41,7 @@ const SmartCoachHome: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Carica dati e inizia conversazione
   useEffect(() => {
@@ -180,12 +182,24 @@ const SmartCoachHome: React.FC = () => {
     return context;
   };
 
-  const addCoachMessage = (content: string) => {
+  const addCoachMessage = async (content: string) => {
     setMessages(prev => [...prev, {
       role: 'coach',
       content,
       timestamp: new Date()
     }]);
+    
+    // Se il suono e abilitato, fai parlare il coach
+    if (soundEnabled && content) {
+      setIsSpeaking(true);
+      try {
+        await voiceService.speak(content);
+      } catch (e) {
+        console.error('TTS error:', e);
+      } finally {
+        setIsSpeaking(false);
+      }
+    }
   };
 
   const addUserMessage = (content: string) => {
@@ -265,6 +279,41 @@ const SmartCoachHome: React.FC = () => {
     }
   };
 
+  // Gestione microfono - Speech to Text
+  const toggleListening = async () => {
+    if (isListening) {
+      // Ferma registrazione e trascrivi
+      setIsListening(false);
+      try {
+        const transcript = await voiceService.stopListening();
+        if (transcript) {
+          setInputText(transcript);
+          // Auto-invia il messaggio
+          addUserMessage(transcript);
+          setIsTyping(true);
+          
+          const response = await coachAI.chat(transcript, {
+            currentExercise: suggestion?.workoutName,
+            totalExercises: suggestion?.exercises
+          });
+          addCoachMessage(response.message);
+          setIsTyping(false);
+        }
+      } catch (e) {
+        console.error('STT error:', e);
+      }
+    } else {
+      // Inizia registrazione
+      try {
+        await voiceService.startListening();
+        setIsListening(true);
+      } catch (e) {
+        console.error('Mic error:', e);
+        alert('Impossibile accedere al microfono');
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center">
@@ -284,12 +333,14 @@ const SmartCoachHome: React.FC = () => {
       {/* Header minimo */}
       <div className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+          <div className={`w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center ${isSpeaking ? 'animate-pulse ring-4 ring-purple-400' : ''}`}>
             <Dumbbell className="w-6 h-6 text-white" />
           </div>
           <div>
             <h1 className="text-white font-bold text-lg">Coach Alex</h1>
-            <p className="text-purple-300 text-sm">Il tuo Personal Trainer AI</p>
+            <p className="text-purple-300 text-sm">
+              {isSpeaking ? 'Sta parlando...' : 'Il tuo Personal Trainer AI'}
+            </p>
           </div>
         </div>
         <button 
@@ -390,10 +441,14 @@ const SmartCoachHome: React.FC = () => {
       <div className="p-4 bg-gray-900/50 backdrop-blur">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => setIsListening(!isListening)}
-            className={`p-3 rounded-full ${isListening ? 'bg-red-500' : 'bg-white/10'} text-white`}
+            onClick={toggleListening}
+            className={`p-3 rounded-full ${isListening ? 'bg-red-500 animate-pulse' : 'bg-white/10'} text-white transition-all`}
           >
-            {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            {isListening ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              <Mic className="w-6 h-6" />
+            )}
           </button>
           
           <input
