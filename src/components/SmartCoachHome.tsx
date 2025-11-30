@@ -55,12 +55,23 @@ const SmartCoachHome: React.FC = () => {
 
   const initializeCoach = async () => {
     setIsLoading(true);
+    console.log('Initializing Coach...');
+    
+    // Timeout di sicurezza - dopo 5 secondi mostra comunque l'interfaccia
+    const timeout = setTimeout(() => {
+      console.log('Timeout reached, showing fallback');
+      const nextWorkout = determineNextWorkout(null);
+      setSuggestion(nextWorkout);
+      setStats({ total: 0, thisWeek: 0 });
+      addCoachMessage("Ciao Manuel! Sono Coach Alex. Pronto per allenarti oggi?");
+      setIsLoading(false);
+    }, 5000);
     
     try {
       let lastWorkoutData = null;
       
-      // Carica ultimo workout (senza .single() per evitare errori se vuoto)
-      const { data: workouts } = await supabase
+      console.log('Fetching workouts...');
+      const { data: workouts, error: workoutsError } = await supabase
         .from('workout_sessions')
         .select('*')
         .eq('user_id', user?.id)
@@ -68,44 +79,38 @@ const SmartCoachHome: React.FC = () => {
         .order('end_time', { ascending: false })
         .limit(1);
       
+      if (workoutsError) {
+        console.error('Workouts error:', workoutsError);
+      }
+      
       if (workouts && workouts.length > 0) {
         lastWorkoutData = workouts[0];
         setLastWorkout(lastWorkoutData);
       }
+      console.log('Last workout:', lastWorkoutData);
 
-      // Carica statistiche
-      const { count: totalWorkouts } = await supabase
-        .from('workout_sessions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-        .eq('completed', true);
-
-      const { count: weekWorkouts } = await supabase
-        .from('workout_sessions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-        .eq('completed', true)
-        .gte('start_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
-
-      setStats({
-        total: totalWorkouts || 0,
-        thisWeek: weekWorkouts || 0
-      });
+      // Stats con valori default
+      setStats({ total: 0, thisWeek: 0 });
 
       // Determina il workout consigliato
       const nextWorkout = determineNextWorkout(lastWorkoutData);
       setSuggestion(nextWorkout);
+      console.log('Next workout:', nextWorkout);
 
-      // Messaggio iniziale del Coach
-      const greeting = await generateGreeting(lastWorkoutData, nextWorkout);
+      // Messaggio iniziale semplice (senza chiamata AI per velocita)
+      const hour = new Date().getHours();
+      let greeting = hour < 12 ? "Buongiorno" : hour < 18 ? "Buon pomeriggio" : "Buonasera";
+      greeting += ` Manuel! Sono Coach Alex. Oggi ti consiglio: ${nextWorkout.workoutName}. Pronto?`;
+      
+      clearTimeout(timeout);
       addCoachMessage(greeting);
 
     } catch (error) {
       console.error('Error initializing coach:', error);
-      // Fallback - mostra comunque l'interfaccia
+      clearTimeout(timeout);
       const nextWorkout = determineNextWorkout(null);
       setSuggestion(nextWorkout);
-      addCoachMessage("Ciao Manuel! Sono Coach Alex, il tuo personal trainer. Pronto per allenarti oggi?");
+      addCoachMessage("Ciao Manuel! Sono Coach Alex. Pronto per allenarti oggi?");
     } finally {
       setIsLoading(false);
     }
@@ -149,37 +154,6 @@ const SmartCoachHome: React.FC = () => {
       exercises: next.exercises,
       estimatedTime: next.time
     };
-  };
-
-  const generateGreeting = async (lastWorkout: any, suggestion: WorkoutSuggestion): Promise<string> => {
-    const hour = new Date().getHours();
-    let timeGreeting = "Ciao";
-    if (hour < 12) timeGreeting = "Buongiorno";
-    else if (hour < 18) timeGreeting = "Buon pomeriggio";
-    else timeGreeting = "Buonasera";
-
-    let context = `${timeGreeting} Manuel!`;
-
-    if (lastWorkout) {
-      const lastDate = new Date(lastWorkout.end_time);
-      const daysSince = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-      const duration = lastWorkout.duration_minutes || Math.floor((new Date(lastWorkout.end_time).getTime() - new Date(lastWorkout.start_time).getTime()) / 60000);
-      
-      if (daysSince === 0) {
-        context += ` Oggi hai gia completato ${lastWorkout.workout_name} in ${duration} minuti. Ottimo lavoro!`;
-      } else if (daysSince === 1) {
-        context += ` Ieri hai fatto ${lastWorkout.workout_name}. Oggi tocca a ${suggestion.workoutName}.`;
-      } else {
-        context += ` L'ultimo allenamento e stato ${daysSince} giorni fa: ${lastWorkout.workout_name}.`;
-      }
-    } else {
-      context += " Benvenuto! Sono Coach Alex, il tuo personal trainer AI.";
-    }
-
-    context += `\n\nOggi ti consiglio: ${suggestion.workoutName}\n${suggestion.reason}`;
-    context += `\n\nVuoi iniziare? Dimmi "Inizia" oppure chiedimi qualsiasi cosa!`;
-
-    return context;
   };
 
   const addCoachMessage = async (content: string) => {
