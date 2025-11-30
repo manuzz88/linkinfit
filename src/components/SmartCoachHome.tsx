@@ -55,17 +55,21 @@ const SmartCoachHome: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Carica ultimo workout
-      const { data: lastWorkoutData } = await supabase
+      let lastWorkoutData = null;
+      
+      // Carica ultimo workout (senza .single() per evitare errori se vuoto)
+      const { data: workouts } = await supabase
         .from('workout_sessions')
         .select('*')
         .eq('user_id', user?.id)
         .eq('completed', true)
         .order('end_time', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
       
-      setLastWorkout(lastWorkoutData);
+      if (workouts && workouts.length > 0) {
+        lastWorkoutData = workouts[0];
+        setLastWorkout(lastWorkoutData);
+      }
 
       // Carica statistiche
       const { count: totalWorkouts } = await supabase
@@ -96,6 +100,9 @@ const SmartCoachHome: React.FC = () => {
 
     } catch (error) {
       console.error('Error initializing coach:', error);
+      // Fallback - mostra comunque l'interfaccia
+      const nextWorkout = determineNextWorkout(null);
+      setSuggestion(nextWorkout);
       addCoachMessage("Ciao Manuel! Sono Coach Alex, il tuo personal trainer. Pronto per allenarti oggi?");
     } finally {
       setIsLoading(false);
