@@ -45,14 +45,13 @@ class CoachAIService {
 
   // Funzioni database spostate nella Edge Function per sicurezza
 
-  // Chiamata principale al Coach AI via Supabase Edge Function
+  // Chiamata principale al Coach AI via Supabase Edge Function con STREAMING
   async chat(
     userMessage: string, 
     context?: WorkoutContext
   ): Promise<CoachResponse> {
     
     try {
-      // Chiama la Edge Function su Supabase
       const response = await fetch(COACH_AI_URL, {
         method: 'POST',
         headers: {
@@ -62,8 +61,7 @@ class CoachAIService {
         },
         body: JSON.stringify({
           message: userMessage,
-          context: context,
-          history: this.conversationHistory
+          context: context
         })
       });
 
@@ -72,27 +70,153 @@ class CoachAIService {
         return this.getLocalFallback();
       }
 
-      const data = await response.json();
+      // Leggi la risposta (non-streaming per semplicita)
+      const contentType = response.headers.get('content-type');
       
-      // Salva nella history per continuita
-      this.conversationHistory.push(
-        { role: 'user', content: userMessage },
-        { role: 'assistant', content: data.message }
-      );
-      
-      // Limita history a 10 messaggi
-      if (this.conversationHistory.length > 20) {
-        this.conversationHistory = this.conversationHistory.slice(-20);
+      if (contentType?.includes('text/event-stream')) {
+        // Gestisci streaming
+        return await this.handleStreamingResponse(response, userMessage);
+      } else {
+        // Risposta normale JSON
+        const data = await response.json();
+        return {
+          message: data.message || "Forza Manuel! Continua cosi!",
+          responseId: data.responseId || '',
+          motivation: this.extractMotivation(data.message)
+        };
       }
-
-      return {
-        message: data.message || "Forza Manuel! Continua cosi!",
-        responseId: data.id || '',
-        motivation: this.extractMotivation(data.message)
-      };
 
     } catch (error) {
       console.error('Coach AI error:', error);
+      return this.getLocalFallback();
+    }
+  }
+
+  // Gestisce risposta streaming
+  private async handleStreamingResponse(
+    response: Response, 
+    userMessage: string
+  ): Promise<CoachResponse> {
+    const reader = response.body?.getReader();
+    if (!reader) return this.getLocalFallback();
+
+    const decoder = new TextDecoder();
+    let fullMessage = '';
+    let responseId = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.type === 'delta') {
+                fullMessage += data.text;
+              } else if (data.type === 'done') {
+                fullMessage = data.message || fullMessage;
+                responseId = data.responseId || '';
+              }
+            } catch {
+              // Ignora errori parsing
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    // Salva nella history
+    this.conversationHistory.push(
+      { role: 'user', content: userMessage },
+      { role: 'assistant', content: fullMessage }
+    );
+    
+    if (this.conversationHistory.length > 20) {
+      this.conversationHistory = this.conversationHistory.slice(-20);
+    }
+
+    return {
+      message: fullMessage || "Forza Manuel! Continua cosi!",
+      responseId,
+      motivation: this.extractMotivation(fullMessage)
+    };
+  }
+
+  // Chat con callback per streaming in tempo reale
+  async chatWithStreaming(
+    userMessage: string,
+    onDelta: (text: string) => void,
+    context?: WorkoutContext
+  ): Promise<CoachResponse> {
+    
+    try {
+      const response = await fetch(COACH_AI_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          context: context
+        })
+      });
+
+      if (!response.ok) {
+        return this.getLocalFallback();
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) return this.getLocalFallback();
+
+      const decoder = new TextDecoder();
+      let fullMessage = '';
+      let responseId = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              if (data.type === 'delta') {
+                fullMessage += data.text;
+                onDelta(data.text); // Callback per ogni delta
+              } else if (data.type === 'done') {
+                responseId = data.responseId || '';
+              }
+            } catch {
+              // Ignora
+            }
+          }
+        }
+      }
+
+      reader.releaseLock();
+
+      return {
+        message: fullMessage,
+        responseId,
+        motivation: this.extractMotivation(fullMessage)
+      };
+
+    } catch (error) {
+      console.error('Streaming error:', error);
       return this.getLocalFallback();
     }
   }
